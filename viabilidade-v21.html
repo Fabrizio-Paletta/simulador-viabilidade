@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudo de Viabilidade — 4 Cenários</title>
+<style>
+:root{
+  --g-900:#0E3D24; --g-700:#1A6B3C; --g-500:#2E8B57;
+  --g-100:#E8F5EE; --g-050:#F4F8F5;
+  --petrol:#16495B; --ink:#22272B; --mut:#5F6B66; --line:#D4EBE0;
+  --warn:#B07C10; --warn-bg:#FBF3E2; --neg:#A3322B; --neg-bg:#F9ECEB;
+  --gold:#B07C10;
+  --r:14px;
+  --sombra:0 1px 2px rgba(20,40,30,.05), 0 6px 20px rgba(20,40,30,.06);
+  --sombra-up:0 2px 4px rgba(20,40,30,.07), 0 12px 32px rgba(20,40,30,.10);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(1200px 400px at 85% -80px, rgba(26,107,60,.07), transparent 60%),
+    var(--g-050);
+  color:var(--ink); font-size:.875rem; line-height:1.45;
+  padding-bottom:56px;
+}
+.num{font-variant-numeric:tabular-nums; letter-spacing:-.01em;}
+button{font:inherit; cursor:pointer;}
+input:focus-visible, button:focus-visible{outline:2px solid var(--petrol); outline-offset:2px; border-radius:4px;}
+@media (pointer:coarse){
+  .grupo{margin-bottom:12px; padding:6px 7px 9px;}
+  .slider-row{gap:12px; margin-top:6px;}
+  input[type=range]{min-height:38px;}
+  input[type=range]::-webkit-slider-thumb{width:26px; height:26px; margin-top:-10px;}
+  input[type=range]::-moz-range-thumb{width:20px; height:20px;}
+  .slider-row input.num{width:64px; min-height:40px; font-size:.85rem;}
+  .fat-grid .campo input{min-height:48px; font-size:1.05rem;}
+  .btn{min-height:44px; padding:10px 15px;}
+  .secao{min-height:44px; padding-top:13px;}
+  .cen-cab input.nome{min-height:40px;}
+}
+@media (max-width:640px){
+  header{padding:14px 14px 12px;}
+  .cab-titulo input.estudo{font-size:1.1rem;}
+  .acoes{width:100%;}
+  .acoes .btn{flex:1; justify-content:center;}
+  .grade{padding:12px 12px 6px; gap:12px;}
+  .comparativo{padding:0 12px;}
+  .rodape-nota{padding:0 14px;}
+  table.comp th:first-child, table.comp td:first-child{
+    position:sticky; left:0; background:#fff; z-index:2;
+    box-shadow:2px 0 4px rgba(20,40,30,.06);
+  }
+  table.comp thead th:first-child{background:var(--g-700);}
+  table.comp tr.forte td:first-child{background:var(--g-050);}
+}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{transition:none !important; animation:none !important;}
+}
+
+/* ============ CABEÇALHO ============ */
+header{
+  background:linear-gradient(130deg,var(--g-900) 0%, var(--g-700) 70%, #1F7A46 100%);
+  color:#fff; padding:18px 22px 16px;
+  display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between;
+}
+.cab-titulo{min-width:280px; flex:1;}
+.cab-titulo .eyebrow{
+  font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:.22em; opacity:.7;
+}
+.cab-titulo input.estudo{
+  display:block; width:100%; max-width:560px; background:transparent; border:none;
+  border-bottom:1px dashed rgba(255,255,255,.35); color:#fff;
+  font:inherit; font-size:1.35rem; font-weight:800; padding:2px 2px 4px; margin-top:2px;
+}
+.cab-titulo input.estudo::placeholder{color:rgba(255,255,255,.45);}
+.cab-titulo .sub{font-size:.73rem; opacity:.8; margin-top:5px;}
+.acoes{display:flex; flex-wrap:wrap; gap:7px;}
+.btn{
+  border:1px solid rgba(255,255,255,.32); background:rgba(255,255,255,.1); color:#fff;
+  border-radius:9px; padding:8px 14px; font-weight:600; font-size:.8rem;
+  display:inline-flex; align-items:center; gap:6px;
+  transition:background .15s, transform .1s;
+}
+.btn:hover{background:rgba(255,255,255,.22);}
+.btn:active{transform:translateY(1px);}
+.btn.pdf{background:#fff; color:var(--g-900); border-color:#fff; font-weight:800;}
+.btn.pdf:hover{background:var(--g-100);}
+
+/* ============ GRADE DE CENÁRIOS ============ */
+.grade{
+  display:grid; grid-template-columns:repeat(4, minmax(264px,1fr));
+  gap:16px; padding:18px 22px 8px; max-width:1580px; margin:0 auto;
+}
+@media (max-width:1140px){ .grade{grid-template-columns:repeat(2,minmax(264px,1fr));} }
+@media (max-width:590px){ .grade{grid-template-columns:1fr;} }
+
+.cenario{
+  background:#fff; border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:var(--sombra);
+  display:flex; flex-direction:column; overflow:hidden; position:relative;
+  transition:box-shadow .2s, transform .2s;
+}
+.cenario:hover{box-shadow:var(--sombra-up); transform:translateY(-2px);}
+.cenario::before{
+  content:""; display:block; height:4px;
+  background:var(--accent, var(--g-700));
+}
+.cenario[data-i="0"]{--accent:#16495B;}
+.cenario[data-i="1"]{--accent:#1A6B3C;}
+.cenario[data-i="2"]{--accent:#2E8B57;}
+.cenario[data-i="3"]{--accent:#B07C10;}
+
+.cen-cab{padding:12px 15px 11px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,#fff, #FAFCFA);}
+.cen-cab input.nome{
+  width:100%; border:none; border-bottom:1px dashed transparent; background:transparent;
+  font:inherit; font-weight:800; font-size:1.04rem; color:var(--accent, var(--g-900)); padding:2px 3px;
+  transition:border-color .15s;
+}
+.cen-cab input.nome:hover, .cen-cab input.nome:focus{border-bottom-color:var(--line);}
+.fat-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:10px;}
+.fat-grid .campo label{
+  font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--mut);
+  display:block; margin-bottom:4px;
+}
+.fat-grid .campo input{
+  width:100%; border:1px solid var(--line); border-radius:9px; padding:8px 10px;
+  font:inherit; font-weight:800; font-size:.95rem; text-align:right; color:var(--petrol);
+  min-height:40px; background:#fff; transition:border-color .15s, box-shadow .15s;
+}
+.fat-grid .campo input:hover{border-color:var(--g-500);}
+.fat-grid .campo input:focus{border-color:var(--g-700); box-shadow:0 0 0 3px rgba(26,107,60,.12); outline:none;}
+.fat-total{
+  display:flex; justify-content:space-between; align-items:center; gap:6px;
+  margin-top:9px; font-size:.74rem; color:var(--mut);
+}
+.fat-total b{font-size:1rem; color:var(--g-900);}
+.mix-badge{
+  font-size:.65rem; font-weight:700; background:var(--g-100); color:var(--g-900);
+  border:1px solid var(--line); border-radius:999px; padding:3px 9px; white-space:nowrap;
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; flex-shrink:1; cursor:help;
+}
+.cen-cab{min-height:148px;}
+.fat-total{min-height:26px;}
+.resultado .r-valor{white-space:nowrap;}
+
+.cen-corpo{padding:6px 15px 4px; flex:1;}
+details.sec > summary{list-style:none; cursor:pointer;}
+details.sec > summary::-webkit-details-marker{display:none;}
+details.sec .chev{display:inline-block; transition:transform .15s; color:var(--mut); font-size:.85em; margin-right:3px;}
+details.sec[open] .chev{transform:rotate(90deg);}
+details.sec > summary:hover{color:var(--g-700);}
+.secao{
+  font-size:.63rem; font-weight:800; text-transform:uppercase; letter-spacing:.14em;
+  color:var(--mut); padding:11px 0 6px; margin-bottom:9px;
+  display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:1px solid var(--line);
+  min-height:34px;
+}
+.secao .s-soma{font-size:.72rem; letter-spacing:0; text-transform:none; color:var(--petrol); font-weight:700;}
+
+.grupo{margin:0 -7px 8px; padding:4px 7px 6px; border-radius:8px; transition:background .15s;}
+.grupo:focus-within{background:var(--g-050);}
+.grupo .topo{display:flex; justify-content:space-between; align-items:baseline; gap:6px; flex-wrap:nowrap; min-height:18px;}
+.grupo .rotulo{
+  font-size:.75rem; font-weight:700; color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;
+}
+.grupo .rotulo small{font-weight:600; color:var(--mut); font-size:.63rem;}
+.grupo .vals{font-size:.73rem; color:var(--mut); white-space:nowrap;}
+.grupo .vals b{color:var(--petrol); font-size:.78rem;}
+.grupo .vals b.fora{color:var(--warn);}
+.grupo .vals b.fora::after{content:" ⚠"; font-size:.6rem;}
+.slider-row{display:flex; align-items:center; gap:8px; margin-top:3px;}
+input[type=range]{
+  flex:1; -webkit-appearance:none; appearance:none; height:6px; border-radius:3px;
+  background:linear-gradient(90deg, var(--accent, var(--g-500)) var(--pct,0%), #E7EFEA var(--pct,0%));
+  min-height:24px;
+  touch-action:pan-y;           /* rolagem vertical sobre o slider NÃO altera o valor */
+}
+.grupo, .secao, .fat-total, .legenda, .btn{-webkit-user-select:none; user-select:none;}
+input[type=range]::-webkit-slider-runnable-track{height:6px; border-radius:3px;}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
+  background:#fff; border:2.5px solid var(--accent, var(--g-700)); cursor:pointer; margin-top:-6px;
+  box-shadow:0 1px 4px rgba(0,0,0,.22); transition:transform .12s;
+}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.12);}
+input[type=range]::-moz-range-thumb{
+  width:13px; height:13px; border-radius:50%; background:#fff; border:2.5px solid var(--accent, var(--g-700)); cursor:pointer;
+}
+.slider-row input.num{
+  width:58px; border:1px solid var(--line); border-radius:8px; padding:4px 6px;
+  font:inherit; font-size:.77rem; font-weight:700; text-align:right; min-height:31px;
+  transition:border-color .15s;
+}
+.slider-row input.num:focus{border-color:var(--g-700); outline:none; box-shadow:0 0 0 3px rgba(26,107,60,.12);}
+.ref{font-size:.61rem; color:#8CA096; margin-top:2px;}
+
+.cmv-strip{
+  display:flex; justify-content:space-between; align-items:center;
+  margin:9px 15px 0; padding:7px 12px; border-radius:9px;
+  font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em;
+  background:var(--g-100); color:var(--g-900); border:1px solid #CBE7D6; cursor:help;
+}
+.cmv-strip b{font-size:1.05rem; letter-spacing:0;}
+.cmv-strip.atencao{background:var(--warn-bg); color:var(--warn); border-color:#E7CE96;}
+.cmv-strip.alto{background:var(--neg-bg); color:var(--neg); border-color:#E5B9B5;}
+.composicao{
+  display:flex; height:18px; border-radius:9px; overflow:hidden; margin:8px 15px 0;
+  border:1px solid var(--line); background:#F0F5F1;
+}
+.composicao i{display:block; height:100%; min-width:0; transition:width .3s ease;}
+
+.resultado{
+  margin:11px 15px 8px; border-radius:11px; padding:12px 12px 11px; text-align:center;
+  transition:background .2s;
+}
+.resultado .r-rotulo{font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.14em; opacity:.8;}
+.resultado .r-valor{font-size:1.55rem; font-weight:800; line-height:1.2; margin-top:1px;}
+.resultado .r-pct{font-size:.8rem; font-weight:700; opacity:.9;}
+.resultado.pos{background:var(--g-100); color:var(--g-900); border:1px solid #CBE7D6;}
+.resultado.warn{background:var(--warn-bg); color:var(--warn); border:1px solid #E7CE96;}
+.resultado.neg{background:var(--neg-bg); color:var(--neg); border:1px solid #E5B9B5;}
+.pe-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  margin:0 15px 8px; padding:7px 11px; border-radius:9px;
+  background:var(--g-050); border:1px dashed var(--line); font-size:.72rem;
+}
+.pe-row .pe-rotulo{font-weight:800; color:var(--petrol); font-size:.66rem; text-transform:uppercase; letter-spacing:.08em;}
+.pe-row b{font-size:.82rem; color:var(--ink);}
+.pe-row small{font-weight:700;}
+.pe-row.ok small{color:var(--g-700);}
+.pe-row.apertado small{color:var(--warn);}
+.pe-row.abaixo{background:var(--neg-bg); border-color:#E5B9B5;}
+.pe-row.abaixo b, .pe-row.abaixo small{color:var(--neg);}
+.detalhe{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  padding:2px 15px 13px;
+}
+.detalhe .st{display:flex; flex-direction:column; gap:1px; min-width:0;}
+.detalhe .st small{
+  font-size:.6rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--mut); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.detalhe .st b{font-size:.78rem; color:var(--ink); white-space:nowrap;}
+
+/* legenda compartilhada */
+.legenda{
+  display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center;
+  max-width:1580px; margin:2px auto 0; padding:4px 22px 0; font-size:.66rem; color:var(--mut);
+}
+.legenda span{display:inline-flex; align-items:center; gap:5px; font-weight:600;}
+.legenda i{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+/* ============ COMPARATIVO ============ */
+.comparativo{max-width:1580px; margin:14px auto 12px; padding:0 22px;}
+.comparativo h2{
+  font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.18em;
+  color:var(--mut); margin-bottom:7px;
+}
+.comparativo .card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--r); overflow:auto;
+  box-shadow:var(--sombra);
+}
+table.comp{width:100%; border-collapse:collapse; font-size:.79rem;}
+table.comp th, table.comp td{padding:9px 14px; text-align:right; white-space:nowrap; border-bottom:1px solid #EEF5F0;}
+table.comp tbody tr:last-child td{border-bottom:none;}
+table.comp tbody tr:hover td{background:#FAFCFA;}
+table.comp th:first-child, table.comp td:first-child{text-align:left;}
+table.comp thead th{
+  background:var(--g-700); color:#fff; font-size:.68rem; text-transform:uppercase; letter-spacing:.07em;
+  position:sticky; top:0;
+}
+table.comp thead th i.dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;}
+table.comp td.pos{color:var(--g-700); font-weight:700;}
+table.comp td.neg{color:var(--neg); font-weight:700;}
+table.comp tr.forte td{font-weight:800; background:var(--g-050);}
+
+.rodape-nota{max-width:1580px; margin:0 auto; padding:0 22px; font-size:.72rem; color:var(--mut);}
+.rodape-nota strong{color:var(--ink);}
+
+/* ============ MÉDIA DE VENDA DIÁRIA ============ */
+.dias{max-width:1580px; margin:14px auto 12px; padding:0 22px;}
+.dias h2{
+  font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.18em;
+  color:var(--mut); margin-bottom:7px;
+}
+.dias .card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--r);
+  box-shadow:var(--sombra); padding:14px 16px;
+}
+.dias-cab{
+  display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; justify-content:space-between;
+  padding-bottom:22px; margin-bottom:12px; border-bottom:1px solid var(--line);
+}
+.dias-chips{display:flex; flex-wrap:wrap; gap:6px;}
+.chip{
+  border:1.5px solid var(--line); background:#fff; color:var(--mut);
+  border-radius:999px; padding:5px 13px; font-size:.74rem; font-weight:700;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.chip i{width:8px; height:8px; border-radius:50%; display:inline-block; background:var(--chip,var(--g-700));}
+.chip.on{border-color:var(--chip,var(--g-700)); color:var(--chip,var(--g-700)); background:var(--g-050);}
+.dias-tk{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;}
+.tk-campo{position:relative;}
+.tk-campo label{
+  display:block; font-size:.62rem; font-weight:800; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--mut); margin-bottom:3px; white-space:nowrap;
+}
+.tk-campo input{
+  width:120px; border:1px solid var(--line); border-radius:8px; padding:6px 9px;
+  font:inherit; font-weight:800; font-size:.9rem; text-align:right; color:var(--petrol); min-height:36px;
+}
+.tk-campo input:focus{border-color:var(--g-700); outline:none; box-shadow:0 0 0 3px rgba(26,107,60,.12);}
+.money{
+  display:flex; align-items:center; border:1px solid var(--line); border-radius:8px;
+  background:#fff; padding-left:9px; min-height:36px; transition:border-color .15s, box-shadow .15s;
+}
+.money:focus-within{border-color:var(--g-700); box-shadow:0 0 0 3px rgba(26,107,60,.12);}
+.money > span{font-weight:800; font-size:.78rem; color:var(--mut);}
+.money > input, .money > input:focus{
+  border:none; box-shadow:none; outline:none; min-height:34px; width:104px; padding:6px 9px 6px 5px;
+}
+.tk-liga{color:var(--mut); font-size:1rem; padding-bottom:8px;}
+.tk-sub{
+  position:absolute; top:calc(100% + 3px); left:2px;
+  font-size:.58rem; color:#8CA096; white-space:nowrap;
+}
+#inpDiasMes{width:110px;}
+@media (max-width:640px){
+  .tk-sub{position:static; white-space:normal; display:block; margin-top:2px;}
+}
+.dia .d-atend{font-size:.68rem; font-weight:700; color:var(--petrol);}
+.dias-resumo{font-size:.74rem; color:var(--mut); display:flex; gap:14px; flex-wrap:wrap; align-items:center;}
+.dias-resumo b{color:var(--g-900); font-size:.85rem;}
+.dias-soma{
+  font-size:.68rem; font-weight:800; border-radius:999px; padding:3px 10px;
+  border:1px solid var(--line); background:var(--g-100); color:var(--g-900);
+}
+.dias-soma.warn{background:var(--warn-bg); color:var(--warn); border-color:#E7CE96;}
+.dias-grid{
+  display:grid; grid-template-columns:repeat(7, 1fr); gap:10px;
+}
+@media (max-width:1140px){ .dias-grid{grid-template-columns:repeat(4,1fr);} }
+@media (max-width:640px){ .dias-grid{grid-template-columns:repeat(2,1fr);} .dias{padding:0 12px;} }
+.dia{
+  border:1px solid var(--line); border-radius:10px; padding:9px 10px 10px;
+  display:flex; flex-direction:column; gap:5px; background:#FBFDFC;
+}
+.dia.pico{background:var(--g-050); border-color:#BFDCCB;}
+.dia .d-nome{font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--petrol);}
+.dia .d-valor{font-size:.98rem; font-weight:800; color:var(--g-900);}
+.dia .d-pct{font-size:.68rem; color:var(--mut);}
+.dia input[type=range]{width:100%; min-height:24px;}
+.dia input.num{
+  width:100%; border:1px solid var(--line); border-radius:7px; padding:4px 6px;
+  font:inherit; font-size:.75rem; font-weight:700; text-align:right; min-height:30px;
+}
+.dia .d-topo{display:flex; justify-content:space-between; align-items:center; gap:4px;}
+.d-toggle{
+  border:1px solid var(--line); background:#fff; color:var(--g-700);
+  border-radius:999px; padding:2px 8px; font-size:.6rem; font-weight:800;
+  text-transform:uppercase; letter-spacing:.05em; min-height:24px;
+}
+.d-toggle:hover{border-color:var(--g-700);}
+.dia.fechado{background:#F3F4F4; border-style:dashed; opacity:.75;}
+.dia.fechado .d-valor{color:var(--mut); text-decoration:line-through; text-decoration-thickness:1px;}
+.dia.fechado .d-toggle{color:var(--neg); border-color:#E5B9B5; background:var(--neg-bg);}
+.dia.fechado input{opacity:.35; pointer-events:none;}
+@media (pointer:coarse){ .d-toggle{min-height:34px; padding:4px 11px; font-size:.66rem;} }
+
+/* ============ RELATÓRIO PDF (impressão) ============ */
+.so-print{display:none;}
+@media print{
+  @page{size:A4 landscape; margin:6mm;}
+  *{print-color-adjust:exact; -webkit-print-color-adjust:exact;
+    transition:none !important; box-shadow:none !important;
+    break-inside:avoid; page-break-inside:avoid;}
+  html{zoom:.78;}                     /* escala p/ 1 página A4 paisagem (Chrome/Edge) */
+  body{background:#fff; padding-bottom:0; font-size:.62rem; line-height:1.22;}
+  header, .legenda, .rodape-nota .no-pdf, .acoes{display:none !important;}
+  .so-print{display:block;}
+  .print-cab{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:3px solid var(--g-700); padding-bottom:6px; margin:0 0 10px;
+  }
+  .print-cab h1{font-size:1.15rem; color:var(--g-900);}
+  .print-cab .p-eyebrow{font-size:.6rem; font-weight:800; text-transform:uppercase; letter-spacing:.2em; color:var(--g-700);}
+  .print-cab .p-data{font-size:.68rem; color:var(--mut); text-align:right;}
+  .grade{grid-template-columns:repeat(4,1fr) !important; gap:6px; padding:0; max-width:none;}
+  .cenario{box-shadow:none; break-inside:avoid; border-radius:8px;}
+  .cenario:hover{transform:none;}
+  .slider-row, .ref{display:none !important;}   /* controles fora; valores % · R$ permanecem no topo de cada grupo */
+  .grupo{margin:0; padding:0;}
+  .grupo .topo{min-height:0;}
+  .grupo .rotulo{font-size:.58rem;}
+  .grupo .vals{font-size:.58rem;}
+  .grupo .vals b{font-size:.6rem;}
+  .secao{padding:4px 0 2px; margin-bottom:3px; min-height:0; font-size:.56rem;}
+  details.sec .chev{display:none;}
+  .composicao{height:10px; margin:4px 10px 0;}
+  .pe-row{margin:4px 10px 3px; padding:4px 8px; font-size:.6rem;}
+  .pe-row b{font-size:.68rem;}
+  .fat-total{margin-top:5px; font-size:.62rem;}
+  .fat-total b{font-size:.78rem;}
+  .fat-grid{gap:6px; margin-top:5px;}
+  .fat-grid .campo label{font-size:.54rem; margin-bottom:1px;}
+  .mix-badge{font-size:.54rem; padding:1px 6px;}
+  .cen-cab{padding:8px 10px;}
+  .cen-cab input, .fat-grid .campo input{border:none; padding:0; min-height:0; background:transparent;}
+  .fat-grid .campo input{font-size:.85rem; text-align:left;}
+  .cen-corpo{padding:2px 10px;}
+  .resultado{margin:3px 10px 2px; padding:4px; border-radius:6px;}
+  .resultado .r-rotulo{font-size:.48rem;}
+  .resultado .r-valor{font-size:.9rem;}
+  .resultado .r-pct{font-size:.56rem;}
+  .pe-row{margin:2px 10px 2px; padding:3px 7px; font-size:.54rem;}
+  .pe-row b{font-size:.62rem;}
+  .cmv-strip{margin:4px 10px 0; padding:3px 8px; font-size:.56rem;}
+  .cmv-strip b{font-size:.72rem;}
+  .money{border:none; padding-left:0; min-height:0;}
+  .money > input{min-height:0; padding:0 0 0 3px; width:auto; text-align:left; font-size:.75rem;}
+  .cen-cab{min-height:0;}
+  .detalhe{padding:0 10px 6px; gap:4px;}
+  .detalhe .st small{font-size:.46rem;}
+  .detalhe .st b{font-size:.6rem;}
+  .dias{padding:0; margin:5px 0 0; break-inside:avoid;}
+  .dias h2{font-size:.5rem; margin-bottom:2px;}
+  .dias .card{box-shadow:none; padding:4px 7px; border-radius:6px;}
+  .dias-cab{padding-bottom:3px; margin-bottom:3px; border-bottom-width:1px;}
+  .dias-resumo{font-size:.54rem; gap:8px;}
+  .dias-resumo b{font-size:.62rem;}
+  .dias-soma{font-size:.5rem; padding:1px 6px;}
+  .dia .d-nome{font-size:.5rem;}
+  .dia .d-pct{font-size:.48rem;}
+  .dias-chips .chip:not(.on){display:none;}
+  .dia input[type=range], .dia input.num, .d-toggle{display:none;}
+  .dias-tk{gap:12px;}
+  .tk-campo input{border:none; padding:0; min-height:0; font-size:.75rem; width:auto; text-align:left;}
+  .tk-campo label{font-size:.5rem; margin-bottom:0;}
+  .tk-liga, .tk-sub{display:none;}
+  .dias-cab{padding-bottom:3px;}
+  .dia .d-atend{font-size:.58rem;}
+  .dia.fechado{opacity:.6;}
+  .dias-grid{grid-template-columns:repeat(7,1fr) !important; gap:4px;}
+  .dia{padding:3px 5px; gap:0; border-radius:5px;}
+  .dia .d-valor{font-size:.62rem;}
+  .comparativo{padding:0; margin:8px 0 0; break-inside:avoid; page-break-inside:avoid;}
+  .comparativo h2{font-size:.56rem; margin-bottom:4px;}
+  .comparativo .card{box-shadow:none; border-radius:6px;}
+  table.comp{font-size:.56rem;}
+  table.comp th, table.comp td{padding:2px 7px;}
+  .comparativo h2{margin-bottom:2px;}
+  .rodape-nota{padding:3px 0 0; font-size:.46rem; line-height:1.3;}
+  .print-cab{margin:0 0 5px; padding-bottom:3px; border-bottom-width:2px;}
+  .print-cab h1{font-size:.85rem;}
+  .print-cab .p-data{font-size:.52rem;}
+  .grade{gap:5px;}
+  .cen-cab{padding:5px 8px;}
+  .cen-corpo{padding:1px 8px;}
+  .detalhe{padding:0 8px 4px;}
+  .fat-total{min-height:0;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="cab-titulo">
+    <div class="eyebrow">Estudo de viabilidade · Food service</div>
+    <input class="estudo" id="inpEstudo" type="text" placeholder="Nome do estudo (ex.: Bar na Tijuca — v1)" aria-label="Nome do estudo">
+    <div class="sub">4 cenários lado a lado · faturamento de comida e bebida separados · CMV por linha · salva automaticamente no navegador</div>
+  </div>
+  <div class="acoes">
+    <button class="btn" id="btnCopiar" title="Copia os percentuais do 1º cenário para os demais, mantendo os faturamentos">⧉ Replicar % do 1º</button>
+    <button class="btn" id="btnReset" title="Volta aos valores demonstrativos">↺ Restaurar</button>
+    <button class="btn pdf" id="btnPdf" title="Gera um relatório em página deitada. Na janela que abrir, escolha o destino 'Salvar como PDF'.">⬇ Salvar análise em PDF</button>
+  </div>
+</header>
+
+<!-- cabeçalho que só aparece no PDF -->
+<div class="so-print print-cab" style="margin:0 0 10px;">
+  <div>
+    <div class="p-eyebrow">Estudo de viabilidade — análise de cenários</div>
+    <h1 id="printTitulo">Estudo de viabilidade</h1>
+  </div>
+  <div class="p-data" id="printData"></div>
+</div>
+
+<div class="grade" id="grade"></div>
+
+<div class="legenda" id="legenda" aria-hidden="true"></div>
+
+<div class="comparativo">
+  <h2>Comparativo entre cenários</h2>
+  <div class="card"><table class="comp" id="tabComp" aria-label="Comparativo entre cenários"></table></div>
+</div>
+
+<div class="dias" id="secDias">
+  <h2>Média de venda diária — dia a dia</h2>
+  <div class="card">
+    <div class="dias-cab">
+      <div class="dias-chips" id="diasChips" role="group" aria-label="Cenário usado no cálculo diário"></div>
+      <div class="dias-tk">
+        <div class="tk-campo">
+          <label for="inpTicket">Ticket médio</label>
+          <div class="money">
+            <span aria-hidden="true">R$</span>
+            <input id="inpTicket" class="num" type="text" inputmode="decimal" autocomplete="off" data-tk aria-label="Ticket médio em reais">
+          </div>
+        </div>
+        <span class="tk-liga" aria-hidden="true">⇄</span>
+        <div class="tk-campo">
+          <label for="inpAtend">Atendimentos/dia (média)</label>
+          <input id="inpAtend" class="num" type="text" inputmode="numeric" autocomplete="off" data-at aria-label="Atendimentos por dia, média dos dias abertos">
+        </div>
+        <div class="tk-campo">
+          <label for="inpDiasMes">Dias de operação/mês</label>
+          <input id="inpDiasMes" class="num" type="text" inputmode="numeric" autocomplete="off" data-dm aria-label="Dias de operação no mês, usado na sobra por dia">
+          <small class="tk-sub num" id="dmSugestao"></small>
+        </div>
+      </div>
+      <div class="dias-resumo">
+        <span>Venda semanal média: <b class="num" id="diaSemanaTotal"></b></span>
+        <span class="dias-soma num" id="diasSoma"></span>
+      </div>
+    </div>
+    <div class="dias-grid" id="diasGrid"></div>
+  </div>
+</div>
+
+<p class="rodape-nota">
+  <strong>Como ler:</strong> CMV de comida incide sobre o faturamento de comida; CMV de bebida sobre o de bebida;
+  os demais grupos incidem sobre o faturamento total. As faixas "ref." são referências usuais de food service no
+  Brasil — valores fora da faixa ficam em âmbar (⚠). <strong>Ponto de equilíbrio:</strong> as despesas (pessoal a operacional) são congeladas no
+  valor em R$ que os sliders produzem sobre o faturamento informado, e divididas pela margem de contribuição
+  (1 − % variáveis, com mix comida/bebida constante). Folga = quanto o faturamento simulado está acima do mínimo;
+  abaixo de 10% (âmbar) a operação fica vulnerável a qualquer queda de movimento. <span class="no-pdf"><strong>PDF:</strong> o botão abre o diálogo do navegador — escolha o destino
+  "Salvar como PDF".</span>
+</p>
+
+<script>
+"use strict";
+const GRUPOS_VAR = [
+  { id:"cmvC", nome:"CMV comida",  sub:"% s/ comida",  base:"c", max:60, ref:[28,34] },
+  { id:"cmvB", nome:"CMV bebida",  sub:"% s/ bebida",  base:"b", max:60, ref:[20,30] },
+  { id:"imp",  nome:"Impostos e deduções", sub:"% s/ total", base:"t", max:25, ref:[4,10] },
+  { id:"tax",  nome:"Taxas cartão + apps", sub:"% s/ total", base:"t", max:25, ref:[3,8] }
+];
+const GRUPOS_FIX = [
+  { id:"pes", nome:"Pessoal",        base:"t", max:60, ref:[20,30] },
+  { id:"ocu", nome:"Ocupação",       base:"t", max:40, ref:[8,15] },
+  { id:"mkt", nome:"Marketing",      base:"t", max:20, ref:[1,4] },
+  { id:"man", nome:"Manutenção",     base:"t", max:15, ref:[1,3] },
+  { id:"adm", nome:"Administrativa", base:"t", max:20, ref:[2,5] },
+  { id:"ope", nome:"Operacional",    base:"t", max:20, ref:[2,6] }
+];
+const GRUPOS = GRUPOS_VAR.concat(GRUPOS_FIX);
+const CORES = { cmvC:"#2E8B57", cmvB:"#7FB069", imp:"#8FB8A2", tax:"#5D8A9B",
+                pes:"#16495B", ocu:"#6B7F76", mkt:"#B07C10", man:"#C99B4A",
+                adm:"#9AA5A0", ope:"#7A8B9B", res:"#0E3D24", neg:"#A3322B" };
+const NOMES_LEG = { cmvC:"CMV comida", cmvB:"CMV bebida", imp:"Impostos", tax:"Taxas",
+                    pes:"Pessoal", ocu:"Ocupação", mkt:"Marketing", man:"Manutenção",
+                    adm:"Administrativa", ope:"Operacional", res:"Resultado" };
+const CHAVE = "dre_rapido_v21";
+
+function seed(){
+  const base = { cmvC:31, cmvB:25, imp:8, tax:5, pes:24, ocu:10, mkt:2, man:1.5, adm:3, ope:3 };
+  const mk = (nome, fc, fb, aj) => {
+    const g = {};
+    GRUPOS.forEach(x => g[x.id] = Math.max(0, +((base[x.id]||0) + ((aj||{})[x.id]||0)).toFixed(1)));
+    return { nome, fc, fb, g };
+  };
+  return { titulo:"",
+    // participação típica de cada dia na venda semanal (food service BR)
+    pesosDia: { seg:8, ter:9, qua:11, qui:13, sex:19, sab:23, dom:17 },
+    diasAbertos: { seg:true, ter:true, qua:true, qui:true, sex:true, sab:true, dom:true },
+    ticket: 68,
+    diasMes: 26,
+    diaCen: 1,   // cenário usado no cálculo (Base)
+    cenarios: [
+    mk("Conservador", 105000, 45000, { cmvC:2, cmvB:2, pes:4, ocu:2 }),
+    mk("Base",        140000, 60000, {}),
+    mk("Otimista",    180000, 80000, { cmvC:-1.5, cmvB:-2, pes:-3, ocu:-1.5 }),
+    mk("Meta",        210000, 90000, { cmvC:-2.5, cmvB:-3, pes:-4, ocu:-2, mkt:1 })
+  ]};
+}
+
+let est;
+try {
+  est = JSON.parse(localStorage.getItem(CHAVE));
+  if (!est) { // migra dados da v2 se existirem
+    const ant = JSON.parse(localStorage.getItem("dre_rapido_v20")) || JSON.parse(localStorage.getItem("dre_rapido_v19")) || JSON.parse(localStorage.getItem("dre_rapido_v18")) || JSON.parse(localStorage.getItem("dre_rapido_v17")) || JSON.parse(localStorage.getItem("dre_rapido_v16")) || JSON.parse(localStorage.getItem("dre_rapido_v15")) || JSON.parse(localStorage.getItem("dre_rapido_v14")) || JSON.parse(localStorage.getItem("dre_rapido_v13")) || JSON.parse(localStorage.getItem("dre_rapido_v12")) || JSON.parse(localStorage.getItem("dre_rapido_v11")) || JSON.parse(localStorage.getItem("dre_rapido_v10")) || JSON.parse(localStorage.getItem("dre_rapido_v9")) || JSON.parse(localStorage.getItem("dre_rapido_v8")) || JSON.parse(localStorage.getItem("dre_rapido_v7")) || JSON.parse(localStorage.getItem("dre_rapido_v6")) || JSON.parse(localStorage.getItem("dre_rapido_v5")) || JSON.parse(localStorage.getItem("dre_rapido_v4")) || JSON.parse(localStorage.getItem("dre_rapido_v3")) || JSON.parse(localStorage.getItem("dre_rapido_v2"));
+    if (ant && ant.cenarios && !ant.cenarios.some(c => c.fc === undefined)) est = { titulo: ant.titulo || "", cenarios: ant.cenarios };
+  }
+  if (!est || !est.cenarios || est.cenarios.some(c => c.fc === undefined)) est = seed();
+  if (est.titulo === undefined) est.titulo = "";
+  if (!est.pesosDia) est.pesosDia = seed().pesosDia;
+  if (!est.diasAbertos) est.diasAbertos = seed().diasAbertos;
+  if (!(Number(est.ticket) > 0)) est.ticket = 68;
+  if (!(Number(est.diasMes) >= 1)) est.diasMes = 26;
+  if (est.diaCen === undefined || est.diaCen < 0 || est.diaCen > 3) est.diaCen = 1;
+} catch(e){ est = seed(); }
+
+const fmt  = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+const fmtNum = v => (Number(v)||0).toLocaleString("pt-BR");            // 140000 -> "140.000"
+const parseNum = s => parseInt(String(s).replace(/\D/g,""), 10) || 0; // "140.000" -> 140000
+const fmtDec = v => (Number(v)||0).toLocaleString("pt-BR",{maximumFractionDigits:1}); // 31.5 -> "31,5"
+const fmtDec2 = v => (Number(v)||0).toLocaleString("pt-BR",{maximumFractionDigits:2});
+const fmtMoney = v => (Number(v)||0).toLocaleString("pt-BR",{minimumFractionDigits:2, maximumFractionDigits:2}); // 1250.5 -> "1.250,50"
+// dinheiro pt-BR: ponto = milhar, vírgula = decimal; tolera "68.5" digitado com ponto
+const parseMoney = s => {
+  s = String(s).replace(/[^\d.,]/g, "");
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  else {
+    const partes = s.split(".");
+    if (partes.length === 2 && partes[1].length <= 2) s = partes.join(".");
+    else s = s.replace(/\./g, "");
+  }
+  const n = parseFloat(s);
+  return isFinite(n) ? n : 0;
+};
+const parseDec = s => {
+  const n = parseFloat(String(s).replace(/[^\d,.]/g,"").replace(",", "."));
+  return isFinite(n) ? n : 0;
+};
+const fmtP = v => v.toLocaleString("pt-BR",{maximumFractionDigits:1}) + "%";
+let timer;
+const salvar = () => { clearTimeout(timer); timer = setTimeout(() => {
+  try{ localStorage.setItem(CHAVE, JSON.stringify(est)); }catch(e){}
+}, 400); };
+
+function htmlGrupo(g, valor){
+  return `<div class="grupo">
+    <div class="topo">
+      <span class="rotulo">${g.nome} ${g.sub ? `<small>${g.sub}</small>` : ""}</span>
+      <span class="vals num"><b data-pct="${g.id}"></b> · <span data-rs="${g.id}"></span></span>
+    </div>
+    <div class="slider-row">
+      <input type="range" min="0" max="${g.max}" step="0.5" value="${valor}" data-g="${g.id}" aria-label="${g.nome} em percentual">
+      <input class="num" type="text" inputmode="decimal" autocomplete="off" value="${fmtDec(valor)}" data-gn="${g.id}" aria-label="${g.nome} valor exato, em percentual">
+    </div>
+    <div class="ref">faixa usual: ${g.ref[0]}–${g.ref[1]}%</div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById("inpEstudo").value = est.titulo || "";
+  document.getElementById("grade").innerHTML = est.cenarios.map((c,i) => `
+    <div class="cenario" data-i="${i}">
+      <div class="cen-cab">
+        <input class="nome" type="text" value="${String(c.nome).replace(/"/g,"&quot;")}" data-f="nome" aria-label="Nome do cenário">
+        <div class="fat-grid">
+          <div class="campo comida"><label for="fc${i}">🍽 Comida (R$/mês)</label>
+            <input id="fc${i}" class="num" type="text" inputmode="numeric" autocomplete="off" value="${fmtNum(c.fc)}" data-f="fc"></div>
+          <div class="campo bebida"><label for="fb${i}">🥂 Bebida (R$/mês)</label>
+            <input id="fb${i}" class="num" type="text" inputmode="numeric" autocomplete="off" value="${fmtNum(c.fb)}" data-f="fb"></div>
+        </div>
+        <div class="fat-total">
+          <span>Total: <b class="num" data-ft></b></span>
+          <span class="mix-badge num" data-mix></span>
+        </div>
+      </div>
+      <div class="cen-corpo">
+        <details class="sec" data-sec="var">
+          <summary class="secao"><span><span class="chev">▸</span>Custos variáveis</span><span class="s-soma num" data-sv></span></summary>
+          <div class="sec-corpo">${GRUPOS_VAR.map(g => htmlGrupo(g, c.g[g.id])).join("")}</div>
+        </details>
+        <details class="sec" data-sec="fix">
+          <summary class="secao"><span><span class="chev">▸</span>Despesas</span><span class="s-soma num" data-sf></span></summary>
+          <div class="sec-corpo">${GRUPOS_FIX.map(g => htmlGrupo(g, c.g[g.id])).join("")}</div>
+        </details>
+      </div>
+      <div class="cmv-strip" data-cmvstrip title="CMV de comida e bebida somados, sobre o faturamento total. Referência saudável em food service: até 32%.">
+        <span>CMV combinado</span>
+        <b class="num" data-cmvx></b>
+      </div>
+      <div class="composicao" data-comp aria-hidden="true"></div>
+      <div class="resultado" data-res>
+        <div class="r-rotulo">Resultado mensal</div>
+        <div class="r-valor num" data-rv></div>
+        <div class="r-pct num" data-rp></div>
+      </div>
+      <div class="pe-row" data-perow title="Faturamento mínimo para resultado zero, mantendo as despesas no valor em R$ do cenário e a proporção comida/bebida.">
+        <span class="pe-rotulo">⚖ Ponto de equilíbrio</span>
+        <span class="num"><b data-pe></b> <small data-pefolga></small></span>
+      </div>
+      <div class="detalhe num">
+        <span class="st"><small data-ctl>Custos totais</small><b data-ct></b></span>
+        <span class="st"><small>Sobra/dia (<span data-ndias></span>d)</small><b data-dia></b></span>
+        <span class="st"><small>Resultado/ano</small><b data-ano></b></span>
+      </div>
+    </div>`).join("");
+  document.getElementById("legenda").innerHTML =
+    Object.keys(NOMES_LEG).map(k => `<span><i style="background:${CORES[k]}"></i>${NOMES_LEG[k]}</span>`).join("");
+  est.cenarios.forEach((_,i) => atualizar(i));
+  aplicarSecoes();
+  renderDias();
+  renderComparativo();
+}
+
+function calc(c){
+  const fc = Number(c.fc)||0, fb = Number(c.fb)||0, fat = fc + fb;
+  const rs = {}; let custos = 0;
+  GRUPOS.forEach(g => {
+    const p = Number(c.g[g.id])||0;
+    const base = g.base === "c" ? fc : g.base === "b" ? fb : fat;
+    rs[g.id] = base * p / 100;
+    custos += rs[g.id];
+  });
+  const res = fat - custos;
+  const somaVar = GRUPOS_VAR.reduce((s,g)=>s+rs[g.id],0);
+  const somaFix = GRUPOS_FIX.reduce((s,g)=>s+rs[g.id],0);
+  // Ponto de equilíbrio: despesas (grupos fixos) congeladas no R$ do faturamento
+  // informado; % variáveis e mix comida/bebida constantes.
+  const mcPct = fat > 0 ? 1 - somaVar / fat : 0;          // índice de margem de contribuição
+  const pe = mcPct > 0 ? somaFix / mcPct : Infinity;      // faturamento de equilíbrio
+  const folga = (isFinite(pe) && fat > 0) ? (fat - pe) / fat * 100 : NaN;
+  return { fc, fb, fat, rs, custos, res,
+    resPct: fat > 0 ? res / fat * 100 : 0,
+    cmvBlend: fat > 0 ? (rs.cmvC + rs.cmvB) / fat * 100 : 0,
+    somaVar, somaFix, mcPct, pe, folga };
+}
+
+function atualizar(i){
+  const c = est.cenarios[i];
+  const col = document.querySelector(`.cenario[data-i="${i}"]`);
+  const k = calc(c);
+  col.querySelector("[data-ft]").textContent = fmt(k.fat);
+  const mixEl = col.querySelector("[data-mix]");
+  if (k.fat > 0) {
+    const pc = Math.round(k.fc/k.fat*100), pb = Math.round(k.fb/k.fat*100);
+    mixEl.textContent = `${pc}% / ${pb}%`;
+    mixEl.title = `${pc}% comida · ${pb}% bebida`;
+  } else { mixEl.textContent = "—"; mixEl.title = ""; }
+  GRUPOS.forEach(g => {
+    const p = Number(c.g[g.id])||0;
+    const bp = col.querySelector(`[data-pct="${g.id}"]`);
+    bp.textContent = fmtP(p);
+    const fora = p < g.ref[0] || p > g.ref[1];
+    bp.classList.toggle("fora", fora);
+    bp.title = fora ? `Fora da faixa usual (${g.ref[0]}–${g.ref[1]}%)` : "";
+    col.querySelector(`[data-rs="${g.id}"]`).textContent = fmt(k.rs[g.id]);
+    col.querySelector(`[data-g="${g.id}"]`).style.setProperty("--pct",(p/g.max*100)+"%");
+  });
+  col.querySelector("[data-sv]").textContent = fmt(k.somaVar);
+  col.querySelector("[data-sf]").textContent = fmt(k.somaFix);
+  const box = col.querySelector("[data-res]");
+  box.className = "resultado " + (k.resPct < 0 ? "neg" : k.resPct < 8 ? "warn" : "pos");
+  col.querySelector("[data-rv]").textContent = fmt(k.res);
+  col.querySelector("[data-rp]").textContent = fmtP(k.resPct) + (k.resPct < 0 ? " — prejuízo" : " de margem");
+  col.querySelector("[data-ctl]").textContent = k.fat > 0 ? "Custos · " + fmtP(k.custos/k.fat*100) : "Custos totais";
+  col.querySelector("[data-ct]").textContent = k.fat > 0 ? fmt(k.custos) : "—";
+  const nd = Math.max(1, Number(est.diasMes) || 26);
+  col.querySelector("[data-ndias]").textContent = String(nd);
+  col.querySelector("[data-dia]").textContent = fmt(k.res/nd);
+  col.querySelector("[data-cmvx]").textContent = fmtP(k.cmvBlend);
+  const strip = col.querySelector("[data-cmvstrip]");
+  if (strip) strip.className = "cmv-strip " + (k.cmvBlend <= 32 ? "" : k.cmvBlend <= 36 ? "atencao" : "alto");
+  col.querySelector("[data-ano]").textContent = fmt(k.res*12);
+  const peRow = col.querySelector("[data-perow]");
+  const peEl = col.querySelector("[data-pe]");
+  const pfEl = col.querySelector("[data-pefolga]");
+  if (!isFinite(k.pe)) {
+    peRow.className = "pe-row abaixo";
+    peEl.textContent = "inatingível";
+    pfEl.textContent = "margem de contribuição ≤ 0";
+  } else {
+    peEl.textContent = fmt(k.pe);
+    const f = k.folga;
+    peRow.className = "pe-row " + (f < 0 ? "abaixo" : f < 10 ? "apertado" : "ok");
+    pfEl.textContent = f >= 0 ? `folga ${fmtP(f)}` : `faltam ${fmtP(-f)}`;
+  }
+  const comp = col.querySelector("[data-comp]");
+  const partes = GRUPOS.map(g =>
+    `<i style="width:${k.fat>0 ? Math.max(k.rs[g.id]/k.fat*100,0) : 0}%;background:${CORES[g.id]}" title="${g.nome}: ${fmt(k.rs[g.id])}"></i>`);
+  partes.push(`<i style="width:${Math.max(k.resPct,0)}%;background:${k.resPct<0?CORES.neg:CORES.res}" title="Resultado: ${fmt(k.res)}"></i>`);
+  comp.innerHTML = partes.join("");
+  renderComparativo();
+}
+
+const DOTS = ["#16495B","#1A6B3C","#2E8B57","#B07C10"];
+function renderComparativo(){
+  const ks = est.cenarios.map(c => ({ nome:c.nome, k:calc(c) }));
+  const kBase = ks[1] ? ks[1].k.res : 0;
+  const cls = v => v > 0 ? "pos" : v < 0 ? "neg" : "";
+  const dif = v => (v >= 0 ? "+" : "−") + fmt(Math.abs(v)).replace("R$", "R$ ");
+  document.getElementById("tabComp").innerHTML = `
+    <thead><tr><th>Indicador</th>${ks.map((x,i)=>`<th><i class="dot" style="background:${DOTS[i]}"></i>${String(x.nome).replace(/</g,"&lt;")}</th>`).join("")}</tr></thead>
+    <tbody>
+      <tr><td>Faturamento total</td>${ks.map(x=>`<td class="num">${fmt(x.k.fat)}</td>`).join("")}</tr>
+      <tr><td>Custos variáveis</td>${ks.map(x=>`<td class="num">${fmt(x.k.somaVar)}</td>`).join("")}</tr>
+      <tr><td>Despesas</td>${ks.map(x=>`<td class="num">${fmt(x.k.somaFix)}</td>`).join("")}</tr>
+      <tr class="forte"><td>Resultado mensal</td>${ks.map(x=>`<td class="num ${cls(x.k.res)}">${fmt(x.k.res)}</td>`).join("")}</tr>
+      <tr class="forte"><td>Margem</td>${ks.map(x=>`<td class="num ${cls(x.k.res)}">${fmtP(x.k.resPct)}</td>`).join("")}</tr>
+      <tr><td>Ponto de equilíbrio</td>${ks.map(x=>`<td class="num">${isFinite(x.k.pe)?fmt(x.k.pe):"inatingível"}</td>`).join("")}</tr>
+      <tr><td>Folga sobre o equilíbrio</td>${ks.map(x=>`<td class="num ${isFinite(x.k.folga)?cls(x.k.folga):""}">${isFinite(x.k.folga)?fmtP(x.k.folga):"—"}</td>`).join("")}</tr>
+      <tr><td>Δ vs Base (mês)</td>${ks.map((x,i)=>`<td class="num ${i===1?"":cls(x.k.res-kBase)}">${i===1?"—":dif(x.k.res-kBase)}</td>`).join("")}</tr>
+      <tr><td>Resultado em 12 meses</td>${ks.map(x=>`<td class="num ${cls(x.k.res)}">${fmt(x.k.res*12)}</td>`).join("")}</tr>
+    </tbody>`;
+  atualizarDias();
+}
+
+/* seções recolhíveis: lembra o estado; no celular, "Despesas" começa fechada */
+const secAberta = {};
+function aplicarSecoes(){
+  document.querySelectorAll("details.sec").forEach(det => {
+    const i = det.closest(".cenario").dataset.i;
+    const k = i + "-" + det.dataset.sec;
+    if (secAberta[k] === undefined) secAberta[k] = true;
+    det.open = secAberta[k];
+  });
+}
+document.getElementById("grade").addEventListener("toggle", e => {
+  const det = e.target;
+  if (!det.matches || !det.matches("details.sec")) return;
+  const i = det.closest(".cenario").dataset.i;
+  secAberta[i + "-" + det.dataset.sec] = det.open;
+}, true);
+
+/* impressão/PDF: abre todas as seções e restaura depois */
+let secSnapshot = null;
+window.addEventListener("beforeprint", () => {
+  secSnapshot = [];
+  document.querySelectorAll("details.sec").forEach(det => {
+    secSnapshot.push([det, det.open]);
+    det.open = true;
+  });
+});
+window.addEventListener("afterprint", () => {
+  if (!secSnapshot) return;
+  secSnapshot.forEach(([det, aberto]) => { det.open = aberto; });
+  secSnapshot = null;
+});
+
+/* ---- trava de toque nos sliders ----
+   Comportamento nativo: tocar em qualquer ponto do trilho salta o valor para lá.
+   Aqui: em telas de toque, o valor só muda se o gesto COMEÇAR no polegar
+   (raio de 34px). Toque no trilho é ignorado; a rolagem da página segue livre.
+   Mouse no PC continua com o clique-no-trilho nativo. */
+const RAIO_POLEGAR = 34;
+function toqueForaDoPolegar(r, clientX){
+  const rect = r.getBoundingClientRect();
+  if (!rect.width) return false;
+  const min = parseFloat(r.min) || 0, max = parseFloat(r.max) || 100;
+  const frac = Math.min(1, Math.max(0, ((parseFloat(r.value) || 0) - min) / ((max - min) || 1)));
+  const thumbW = 26;
+  const centroPolegar = rect.left + thumbW / 2 + frac * (rect.width - thumbW);
+  return Math.abs(clientX - centroPolegar) > RAIO_POLEGAR;
+}
+window._toqueForaDoPolegar = toqueForaDoPolegar; // exposto p/ testes
+const gradeEl = document.getElementById("grade");
+gradeEl.addEventListener("touchstart", e => {
+  const r = e.target;
+  if (!r.matches || !r.matches('input[type="range"]')) return;
+  const x = e.touches && e.touches[0] ? e.touches[0].clientX : null;
+  if (x === null) return;
+  if (toqueForaDoPolegar(r, x)) r.dataset.bloq = r.value;  // congela o valor deste gesto
+}, { passive: true });
+["touchend", "touchcancel"].forEach(ev =>
+  gradeEl.addEventListener(ev, e => {
+    const r = e.target;
+    if (r && r.dataset && r.dataset.bloq !== undefined) delete r.dataset.bloq;
+  }, { passive: true })
+);
+
+gradeEl.addEventListener("input", e => {
+  const col = e.target.closest(".cenario");
+  if (!col) return;
+  const i = Number(col.dataset.i);
+  const c = est.cenarios[i];
+  const t = e.target;
+  if (t.dataset.g !== undefined && t.dataset.bloq !== undefined) {
+    t.value = t.dataset.bloq;   // gesto começou fora do polegar: reverte na hora
+    return;
+  }
+  if (t.dataset.f === "nome") { c.nome = t.value; renderComparativo(); salvar(); return; }
+  if (t.dataset.f === "fc" || t.dataset.f === "fb") {
+    const v = parseNum(t.value);
+    c[t.dataset.f] = v;
+    // reformata mantendo o cursor na mesma posição relativa aos dígitos
+    const digitosAntes = t.value.slice(0, t.selectionStart == null ? t.value.length : t.selectionStart).replace(/\D/g,"").length;
+    t.value = v > 0 ? fmtNum(v) : "";
+    if (t.selectionStart != null) {
+      let pos = 0, dig = 0;
+      while (pos < t.value.length && dig < digitosAntes) { if (/\d/.test(t.value[pos])) dig++; pos++; }
+      t.setSelectionRange(pos, pos);
+    }
+    atualizar(i); salvar(); return;
+  }
+  const gid = t.dataset.g || t.dataset.gn;
+  if (!gid) return;
+  const def = GRUPOS.find(x => x.id === gid);
+  let v = parseDec(t.value);
+  if (v < 0) v = 0;
+  if (def && v > def.max) v = def.max;
+  c.g[gid] = v;
+  if (t.dataset.g) {
+    // origem: slider -> escreve o texto formatado com vírgula
+    const campo = col.querySelector(`[data-gn="${gid}"]`);
+    if (campo) campo.value = fmtDec(v);
+  } else {
+    // origem: digitação -> move o slider sem reescrever o que o usuário está digitando
+    const sl = col.querySelector(`[data-g="${gid}"]`);
+    if (sl) sl.value = v;
+    if (parseDec(t.value) !== v) t.value = fmtDec(v); // reescreve apenas se passou do limite
+  }
+  atualizar(i); salvar();
+});
+
+/* ---- média de venda diária ---- */
+const DIAS = [["seg","Segunda"],["ter","Terça"],["qua","Quarta"],["qui","Quinta"],["sex","Sexta"],["sab","Sábado"],["dom","Domingo"]];
+const SEMANAS_MES = 4.345;
+
+function renderDias(){
+  document.getElementById("diasChips").innerHTML = est.cenarios.map((c,i) =>
+    `<button type="button" class="chip ${i===est.diaCen?"on":""}" style="--chip:${DOTS[i]}" data-diacen="${i}"><i></i>${String(c.nome).replace(/</g,"&lt;")}</button>`
+  ).join("");
+  document.getElementById("diasGrid").innerHTML = DIAS.map(dd => {
+    const aberto = est.diasAbertos[dd[0]] !== false;
+    return `
+    <div class="dia ${aberto ? "" : "fechado"}" data-dia="${dd[0]}">
+      <div class="d-topo">
+        <span class="d-nome">${dd[1]}</span>
+        <button type="button" class="d-toggle" data-toggledia="${dd[0]}" aria-pressed="${!aberto}"
+          title="${aberto ? "Marcar como fechado: o percentual deste dia é redistribuído proporcionalmente entre os dias abertos" : "Reabrir o dia: volta a participar da distribuição com o peso original"}">
+          ${aberto ? "Aberto" : "Fechado"}</button>
+      </div>
+      <span class="d-valor num" data-dv="${dd[0]}"></span>
+      <span class="d-atend num" data-da="${dd[0]}"></span>
+      <span class="d-pct num" data-dp="${dd[0]}"></span>
+      <input type="range" min="0" max="40" step="0.1" value="${est.pesosDia[dd[0]]}" data-pd="${dd[0]}" ${aberto ? "" : "disabled"} aria-label="Participação de ${dd[1]} na venda semanal">
+      <input class="num" type="text" inputmode="decimal" autocomplete="off" value="${fmtDec(est.pesosDia[dd[0]])}" data-pdn="${dd[0]}" ${aberto ? "" : "disabled"} aria-label="Participação de ${dd[1]}, em percentual">
+    </div>`;
+  }).join("");
+  atualizarDias();
+}
+
+function atualizarDias(){
+  const grid = document.getElementById("diasGrid");
+  if (!grid || !grid.children.length) return;
+  const k = calc(est.cenarios[est.diaCen]);
+  const semana = k.fat / SEMANAS_MES;
+  document.getElementById("diaSemanaTotal").textContent = fmt(semana);
+  const abertos = DIAS.filter(d => est.diasAbertos[d[0]] !== false);
+  const somaAbertos = abertos.reduce((a,d)=>a+(Number(est.pesosDia[d[0]])||0),0);
+  const somaEl = document.getElementById("diasSoma");
+  if (!abertos.length || somaAbertos <= 0) {
+    somaEl.className = "dias-soma num warn";
+    somaEl.textContent = "⚠ nenhum dia aberto com peso — não há o que distribuir";
+  } else if (Math.abs(somaAbertos - 100) < 0.35) {
+    somaEl.className = "dias-soma num";
+    somaEl.textContent = "✔ 100% em " + abertos.length + " dia" + (abertos.length>1?"s":"") + (abertos.length===7 ? " · semana completa" : " aberto" + (abertos.length>1?"s":""));
+  } else {
+    somaEl.className = "dias-soma num warn";
+    somaEl.textContent = "⚠ dias abertos somam " + fmtDec(somaAbertos) + "% — % efetiva já normalizada p/ 100%";
+  }
+  // % efetiva de cada dia aberto = peso / soma dos pesos abertos (fechado = 0)
+  const efetivo = {};
+  DIAS.forEach(dd => {
+    const aberto = est.diasAbertos[dd[0]] !== false;
+    efetivo[dd[0]] = (aberto && somaAbertos > 0) ? (Number(est.pesosDia[dd[0]])||0) / somaAbertos * 100 : 0;
+  });
+  // ticket médio <-> atendimentos/dia (média dos dias abertos)
+  const mediaDiaria = abertos.length > 0 ? semana / abertos.length : 0;
+  const inpDm = document.getElementById("inpDiasMes");
+  if (inpDm && document.activeElement !== inpDm) inpDm.value = String(Math.max(1, Number(est.diasMes) || 26));
+  const sug = document.getElementById("dmSugestao");
+  if (sug) {
+    const sugerido = Math.round(abertos.length * SEMANAS_MES);
+    sug.textContent = abertos.length > 0 ? `sugestão: ${sugerido}d (${abertos.length} dias abertos × 4,3)` : "";
+  }
+  const atendMedia = (Number(est.ticket) > 0 && mediaDiaria > 0) ? mediaDiaria / est.ticket : 0;
+  const inpTk = document.getElementById("inpTicket");
+  const inpAt = document.getElementById("inpAtend");
+  if (inpTk && document.activeElement !== inpTk) inpTk.value = fmtMoney(est.ticket);
+  if (inpAt && document.activeElement !== inpAt) inpAt.value = atendMedia > 0 ? String(Math.round(atendMedia)) : "—";
+  const maxEf = Math.max(...DIAS.map(d=>efetivo[d[0]]));
+  DIAS.forEach(dd => {
+    const aberto = est.diasAbertos[dd[0]] !== false;
+    const ef = efetivo[dd[0]];
+    const vDia = semana * ef / 100;
+    const at = grid.querySelector(`[data-da="${dd[0]}"]`);
+    if (at) at.textContent = (aberto && Number(est.ticket) > 0 && vDia > 0)
+      ? "≈ " + Math.round(vDia / est.ticket).toLocaleString("pt-BR") + " atendimentos"
+      : (aberto ? "" : "—");
+    grid.querySelector(`[data-dv="${dd[0]}"]`).textContent = aberto ? fmt(vDia) : "Fechado";
+    grid.querySelector(`[data-dp="${dd[0]}"]`).textContent = aberto
+      ? fmtDec(ef) + "% da semana" + (Math.abs(ef - (Number(est.pesosDia[dd[0]])||0)) > 0.05 ? " (peso " + fmtDec(est.pesosDia[dd[0]]) + ")" : "")
+      : fmtDec(est.pesosDia[dd[0]]) + "% movidos p/ os dias abertos · voltam ao reabrir";
+    const sl = grid.querySelector(`[data-pd="${dd[0]}"]`);
+    sl.style.setProperty("--pct", ((Number(est.pesosDia[dd[0]])||0)/40*100)+"%");
+    grid.querySelector(`[data-dia="${dd[0]}"]`).classList.toggle("pico", aberto && ef === maxEf && ef > 0);
+  });
+}
+
+const secDias = document.getElementById("secDias");
+secDias.addEventListener("click", e => {
+  const tg = e.target.closest("[data-toggledia]");
+  if (tg) {
+    const dia = tg.dataset.toggledia;
+    const estavaAberto = est.diasAbertos[dia] !== false;
+    const p = Number(est.pesosDia[dia]) || 0;
+    const outrosAbertos = DIAS.map(x=>x[0]).filter(k => k !== dia && est.diasAbertos[k] !== false);
+    const somaOutros = outrosAbertos.reduce((a,k)=>a+(Number(est.pesosDia[k])||0),0);
+    if (estavaAberto) {
+      // FECHAR: o % deste dia é somado proporcionalmente aos dias abertos
+      if (somaOutros > 0 && p > 0) {
+        const fator = (somaOutros + p) / somaOutros;
+        outrosAbertos.forEach(k => { est.pesosDia[k] = +( (Number(est.pesosDia[k])||0) * fator ).toFixed(1); });
+      }
+      est.diasAbertos[dia] = false;   // o peso original fica guardado em pesosDia[dia]
+    } else {
+      // REABRIR: o dia retoma o peso guardado; os demais devolvem proporcionalmente
+      if (somaOutros > 0 && p > 0 && p < somaOutros + p) {
+        const fator = Math.max(0, somaOutros - p) / somaOutros;
+        outrosAbertos.forEach(k => { est.pesosDia[k] = +( (Number(est.pesosDia[k])||0) * fator ).toFixed(1); });
+      }
+      est.diasAbertos[dia] = true;
+    }
+    renderDias(); salvar();
+    return;
+  }
+  const b = e.target.closest("[data-diacen]");
+  if (!b) return;
+  est.diaCen = Number(b.dataset.diacen);
+  renderDias(); salvar();
+});
+secDias.addEventListener("input", e => {
+  const t = e.target;
+  if (t.dataset.tk !== undefined) {
+    const v = parseMoney(t.value);
+    if (v > 0) est.ticket = v;         // atendimentos deriva no atualizarDias()
+    atualizarDias(); salvar();
+    return;
+  }
+  if (t.dataset.dm !== undefined) {
+    let v = Math.round(parseDec(t.value));
+    if (v >= 1) est.diasMes = Math.min(31, v);
+    // recalcula a sobra/dia nas 4 colunas
+    est.cenarios.forEach((_, ix) => atualizar(ix));
+    salvar();
+    return;
+  }
+  if (t.dataset.at !== undefined) {
+    const at = parseDec(t.value);
+    const abertosN = DIAS.filter(d => est.diasAbertos[d[0]] !== false).length;
+    const semana = calc(est.cenarios[est.diaCen]).fat / SEMANAS_MES;
+    const mediaDiaria = abertosN > 0 ? semana / abertosN : 0;
+    if (at > 0 && mediaDiaria > 0) est.ticket = mediaDiaria / at;  // ticket recalculado
+    atualizarDias(); salvar();
+    return;
+  }
+  const dia = t.dataset.pd || t.dataset.pdn;
+  if (!dia) return;
+  if (t.dataset.pd !== undefined && t.dataset.bloq !== undefined) { t.value = t.dataset.bloq; return; }
+  let v = parseDec(t.value);
+  if (v < 0) v = 0;
+  if (v > 40) v = 40;
+  est.pesosDia[dia] = v;
+  if (t.dataset.pd !== undefined) {
+    const campo = secDias.querySelector(`[data-pdn="${dia}"]`);
+    if (campo) campo.value = fmtDec(v);
+  } else {
+    const sl = secDias.querySelector(`[data-pd="${dia}"]`);
+    if (sl) sl.value = v;
+    if (parseDec(t.value) !== v) t.value = fmtDec(v);
+  }
+  atualizarDias(); salvar();
+});
+secDias.addEventListener("focusout", e => {
+  const t = e.target;
+  if (!t.dataset) return;
+  if (t.dataset.pdn) { t.value = fmtDec(est.pesosDia[t.dataset.pdn]); return; }
+  if (t.dataset.tk !== undefined || t.dataset.at !== undefined) { atualizarDias(); return; }
+  if (t.dataset.dm !== undefined) {
+    t.value = String(Math.max(1, Number(est.diasMes) || 26));
+    est.cenarios.forEach((_, ix) => atualizar(ix));
+  }
+}, true);
+/* mesma trava de toque dos sliders dos cenários */
+secDias.addEventListener("touchstart", e => {
+  const r = e.target;
+  if (!r.matches || !r.matches('input[type="range"]')) return;
+  const x = e.touches && e.touches[0] ? e.touches[0].clientX : null;
+  if (x !== null && toqueForaDoPolegar(r, x)) r.dataset.bloq = r.value;
+}, { passive: true });
+["touchend","touchcancel"].forEach(ev =>
+  secDias.addEventListener(ev, e => {
+    const r = e.target;
+    if (r && r.dataset && r.dataset.bloq !== undefined) delete r.dataset.bloq;
+  }, { passive: true })
+);
+
+document.getElementById("inpEstudo").addEventListener("input", e => { est.titulo = e.target.value; salvar(); });
+
+document.getElementById("btnPdf").addEventListener("click", () => {
+  document.getElementById("printTitulo").textContent = (est.titulo || "Estudo de viabilidade").trim() || "Estudo de viabilidade";
+  document.getElementById("printData").innerHTML =
+    "Gerado em " + new Date().toLocaleDateString("pt-BR", { day:"2-digit", month:"long", year:"numeric" }) +
+    "<br>Análise rápida · valores mensais em R$";
+  window.print();
+});
+
+document.getElementById("btnCopiar").addEventListener("click", () => {
+  if (!confirm("Copiar os percentuais do 1º cenário para os outros três? Os faturamentos serão mantidos.")) return;
+  const ref = est.cenarios[0].g;
+  for (let i = 1; i < est.cenarios.length; i++) est.cenarios[i].g = JSON.parse(JSON.stringify(ref));
+  render(); salvar();
+});
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (!confirm("Restaurar os 4 cenários aos valores demonstrativos? Suas alterações serão perdidas.")) return;
+  const titulo = est.titulo;
+  est = seed(); est.titulo = titulo;
+  render(); salvar();
+});
+
+document.getElementById("grade").addEventListener("focusout", e => {
+  const t = e.target;
+  if (!t.dataset) return;
+  if ((t.dataset.f === "fc" || t.dataset.f === "fb") && t.value.trim() === "") { t.value = "0"; return; }
+  if (t.dataset.gn) {
+    const i = Number(t.closest(".cenario").dataset.i);
+    t.value = fmtDec(est.cenarios[i].g[t.dataset.gn]);
+  }
+}, true);
+
+render();
+</script>
+</body>
+</html>
